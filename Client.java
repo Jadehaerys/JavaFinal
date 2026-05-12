@@ -18,9 +18,9 @@ public class Client {
             for (Transaction t : transactions) {
 
                 writer.println(
-                    t.getType() + " | " +
-                    t.description + " | " +
-                    t.amount
+                        t.getType() + " | " +
+                        t.description + " | " +
+                        t.amount
                 );
             }
 

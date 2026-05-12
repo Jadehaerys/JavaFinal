@@ -1,1 +1,2 @@
-INCOME,Nipalit kog lubot,599.0
+INCOME,Salary,40000.0
+EXPENSE,30000,50000.0

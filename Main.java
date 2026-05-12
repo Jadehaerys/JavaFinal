@@ -1,5 +1,6 @@
 import java.util.*;
 import java.io.*;
+import java.net.*;
 
 // INTERFACE
 interface Calculable {
@@ -66,7 +67,7 @@ public class Main {
 
         while (true) {
 
-            System.out.println("\n==== BUDGET TRACKER MENU ====");
+            System.out.println("\n===== BUDGET TRACKER SYSTEM =====");
             System.out.println("1. Add Income");
             System.out.println("2. Add Expense");
             System.out.println("3. View Transactions");
@@ -74,10 +75,10 @@ public class Main {
             System.out.println("5. Save to File");
             System.out.println("6. Load from File");
             System.out.println("7. Send to Server");
-            System.out.println("8. Exit");
+            System.out.println("8. Get Financial Tip");
+            System.out.println("9. Exit");
 
-            System.out.print("Enter choice: ");
-
+            System.out.print("Enter Choice: ");
             int choice = sc.nextInt();
             sc.nextLine();
 
@@ -112,6 +113,10 @@ public class Main {
                     break;
 
                 case 8:
+                    getFinancialTip();
+                    break;
+
+                case 9:
                     System.out.println("Exiting system...");
                     return;
 
@@ -124,10 +129,10 @@ public class Main {
     // ADD TRANSACTION
     static void addTransaction(Scanner sc, boolean isIncome) {
 
-        System.out.print("Enter description: ");
+        System.out.print("Enter Description: ");
         String desc = sc.nextLine();
 
-        System.out.print("Enter amount: ");
+        System.out.print("Enter Amount: ");
         double amount = sc.nextDouble();
 
         Transaction t;
@@ -147,38 +152,37 @@ public class Main {
     static void viewTransactions() {
 
         if (transactions.isEmpty()) {
-            System.out.println("No transactions found.");
+            System.out.println("No transactions available.");
             return;
         }
 
-        System.out.println("\n==== TRANSACTION HISTORY ====");
+        System.out.println("\n===== TRANSACTION HISTORY =====");
 
         for (Transaction t : transactions) {
 
             System.out.println(
-                t.getType() +
-                " | " +
-                t.description +
-                " | " +
-                t.amount
+                    t.getType() +
+                    " | " +
+                    t.description +
+                    " | " +
+                    t.amount
             );
         }
     }
 
-    // COMPUTATION + POLYMORPHISM
+    // POLYMORPHISM + COMPUTATION
     static void viewBalance() {
 
         double total = 0;
 
         for (Transaction t : transactions) {
-
             total += t.calculate();
         }
 
         System.out.println("Current Balance: " + total);
     }
 
-    // JAVA IO - SAVE FILE
+    // JAVA IO - SAVE
     static void saveToFile() {
 
         try {
@@ -188,9 +192,9 @@ public class Main {
             for (Transaction t : transactions) {
 
                 writer.println(
-                    t.getType() + "," +
-                    t.description + "," +
-                    t.amount
+                        t.getType() + "," +
+                        t.description + "," +
+                        t.amount
                 );
             }
 
@@ -200,11 +204,11 @@ public class Main {
 
         } catch (Exception e) {
 
-            System.out.println("Error saving file.");
+            System.out.println("Error saving transactions.");
         }
     }
 
-    // JAVA IO - LOAD FILE
+    // JAVA IO - LOAD
     static void loadFromFile() {
 
         try {
@@ -227,15 +231,11 @@ public class Main {
 
                 if (type.equals("INCOME")) {
 
-                    transactions.add(
-                        new Income(desc, amount)
-                    );
+                    transactions.add(new Income(desc, amount));
 
                 } else {
 
-                    transactions.add(
-                        new Expense(desc, amount)
-                    );
+                    transactions.add(new Expense(desc, amount));
                 }
             }
 
@@ -245,13 +245,54 @@ public class Main {
 
         } catch (Exception e) {
 
-            System.out.println("Error loading file.");
+            System.out.println("Error loading transactions.");
         }
     }
 
-    // NETWORKING
+    // JAVA NETWORKING
     static void sendToServer() {
 
         Client.sendData(transactions);
+    }
+
+    // API REQUEST
+    static void getFinancialTip() {
+
+        try {
+
+            URL url = new URL("https://api.adviceslip.com/advice");
+
+            HttpURLConnection connection =
+                    (HttpURLConnection) url.openConnection();
+
+            connection.setRequestMethod("GET");
+
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(connection.getInputStream())
+            );
+
+            String line;
+            StringBuilder response = new StringBuilder();
+
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+
+            reader.close();
+
+            String json = response.toString();
+
+            int start = json.indexOf("advice\":\"") + 9;
+            int end = json.indexOf("\"}", start);
+
+            String advice = json.substring(start, end);
+
+            System.out.println("\nFinancial Tip:");
+            System.out.println(advice);
+
+        } catch (Exception e) {
+
+            System.out.println("Failed to fetch financial tip.");
+        }
     }
 }
