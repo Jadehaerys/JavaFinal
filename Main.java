@@ -1,13 +1,14 @@
 import java.util.*;
 import java.io.*;
 
-// INTERFACE Miss
+// INTERFACE
 interface Calculable {
     double calculate();
 }
 
-// ABSTRACT CLASS Miss
+// ABSTRACT CLASS
 abstract class Transaction implements Calculable {
+
     protected String description;
     protected double amount;
 
@@ -19,54 +20,64 @@ abstract class Transaction implements Calculable {
     public abstract String getType();
 }
 
-// INHERITANCE Miss
+// INHERITANCE
 class Income extends Transaction {
+
     public Income(String description, double amount) {
         super(description, amount);
     }
 
+    @Override
     public double calculate() {
         return amount;
     }
 
+    @Override
     public String getType() {
         return "INCOME";
     }
 }
 
 class Expense extends Transaction {
+
     public Expense(String description, double amount) {
         super(description, amount);
     }
 
+    @Override
     public double calculate() {
         return -amount;
     }
 
+    @Override
     public String getType() {
         return "EXPENSE";
     }
 }
 
+// MAIN CLASS
 public class Main {
 
     static List<Transaction> transactions = new ArrayList<>();
 
     public static void main(String[] args) {
+
         Scanner sc = new Scanner(System.in);
 
         while (true) {
 
-            System.out.println("\n==== MENU ====");
+            System.out.println("\n==== BUDGET TRACKER MENU ====");
             System.out.println("1. Add Income");
             System.out.println("2. Add Expense");
             System.out.println("3. View Transactions");
             System.out.println("4. View Balance");
             System.out.println("5. Save to File");
             System.out.println("6. Load from File");
-            System.out.println("7. Exit");
+            System.out.println("7. Send to Server");
+            System.out.println("8. Exit");
 
-            System.out.print("Choice: ");
+            System.out.print("Enter choice: ");
+
             int choice = sc.nextInt();
             sc.nextLine();
 
@@ -97,7 +108,11 @@ public class Main {
                     break;
 
                 case 7:
-                    System.out.println("Exiting...");
+                    sendToServer();
+                    break;
+
+                case 8:
+                    System.out.println("Exiting system...");
                     return;
 
                 default:
@@ -106,12 +121,13 @@ public class Main {
         }
     }
 
+    // ADD TRANSACTION
     static void addTransaction(Scanner sc, boolean isIncome) {
 
-        System.out.print("Description: ");
+        System.out.print("Enter description: ");
         String desc = sc.nextLine();
 
-        System.out.print("Amount: ");
+        System.out.print("Enter amount: ");
         double amount = sc.nextDouble();
 
         Transaction t;
@@ -124,9 +140,10 @@ public class Main {
 
         transactions.add(t);
 
-        System.out.println("Transaction added!");
+        System.out.println("Transaction added successfully!");
     }
 
+    // VIEW TRANSACTIONS
     static void viewTransactions() {
 
         if (transactions.isEmpty()) {
@@ -134,9 +151,10 @@ public class Main {
             return;
         }
 
-        System.out.println("\n=== TRANSACTIONS ===");
+        System.out.println("\n==== TRANSACTION HISTORY ====");
 
         for (Transaction t : transactions) {
+
             System.out.println(
                 t.getType() +
                 " | " +
@@ -147,18 +165,20 @@ public class Main {
         }
     }
 
+    // COMPUTATION + POLYMORPHISM
     static void viewBalance() {
 
         double total = 0;
 
         for (Transaction t : transactions) {
-            total += t.calculate(); // POLYMORPHISM MISS
+
+            total += t.calculate();
         }
 
         System.out.println("Current Balance: " + total);
     }
 
-    // JAVA IO MISS
+    // JAVA IO - SAVE FILE
     static void saveToFile() {
 
         try {
@@ -176,7 +196,7 @@ public class Main {
 
             writer.close();
 
-            System.out.println("Transactions saved!");
+            System.out.println("Transactions saved successfully!");
 
         } catch (Exception e) {
 
@@ -184,7 +204,7 @@ public class Main {
         }
     }
 
-    // JAVA IO GIHAPON MISS
+    // JAVA IO - LOAD FILE
     static void loadFromFile() {
 
         try {
@@ -206,19 +226,32 @@ public class Main {
                 double amount = Double.parseDouble(data[2]);
 
                 if (type.equals("INCOME")) {
-                    transactions.add(new Income(desc, amount));
+
+                    transactions.add(
+                        new Income(desc, amount)
+                    );
+
                 } else {
-                    transactions.add(new Expense(desc, amount));
+
+                    transactions.add(
+                        new Expense(desc, amount)
+                    );
                 }
             }
 
             reader.close();
 
-            System.out.println("Transactions loaded!");
+            System.out.println("Transactions loaded successfully!");
 
         } catch (Exception e) {
 
             System.out.println("Error loading file.");
         }
+    }
+
+    // NETWORKING
+    static void sendToServer() {
+
+        Client.sendData(transactions);
     }
 }
